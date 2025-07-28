@@ -1,0 +1,151 @@
+project_name: cloudpork-agent
+
+# Build configuration
+builds:
+  - id: cloudpork
+    binary: cloudpork
+    main: ./main.go
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/carsor007/cloudpork-agent/cmd.version={{.Version}}
+      - -X github.com/carsor007/cloudpork-agent/cmd.commit={{.Commit}}
+      - -X github.com/carsor007/cloudpork-agent/cmd.date={{.Date}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - "7"
+    ignore:
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+
+# Archive configuration
+archives:
+  - id: default
+    builds:
+      - cloudpork
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE*
+      - CHANGELOG*
+
+# Checksums
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+# Snapshot configuration
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+# Changelog configuration
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+
+# Release configuration
+release:
+  github:
+    owner: carsor007
+    name: cloudpork-agent
+  draft: false
+  prerelease: auto
+  name_template: "CloudPork Agent v{{ .Version }}"
+  header: |
+    ## CloudPork Agent v{{ .Version }} 🐷
+    
+    Cut the pork from your cloud costs with improved analysis capabilities!
+    
+    ### Installation
+    
+    ```bash
+    # Install via script
+    curl -sSL https://cli.cloudpork.com/install.sh | bash
+    
+    # Or download binary directly from assets below
+    ```
+    
+    ### What's New
+
+# Homebrew tap (for macOS users)
+brews:
+  - name: cloudpork
+    ids:
+      - cloudpork
+    tap:
+      owner: carsor007
+      name: homebrew-tap
+    homepage: https://cloudpork.com
+    description: "Cut the pork from your cloud costs - analyze and optimize your infrastructure spending"
+    license: MIT
+    install: |
+      bin.install "cloudpork"
+    test: |
+      system "#{bin}/cloudpork --version"
+
+# Linux packages
+nfpms:
+  - id: cloudpork
+    builds:
+      - cloudpork
+    package_name: cloudpork
+    vendor: CloudPork
+    homepage: https://cloudpork.com
+    maintainer: CloudPork Team <support@cloudpork.com>
+    description: "Cut the pork from your cloud costs - analyze and optimize your infrastructure spending"
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    dependencies:
+      - curl
+    recommends:
+      - git
+    bindir: /usr/local/bin
+
+# Docker images
+dockers:
+  - ids:
+      - cloudpork
+    image_templates:
+      - "cloudpork/agent:latest"
+      - "cloudpork/agent:{{ .Tag }}"
+      - "cloudpork/agent:v{{ .Major }}"
+      - "cloudpork/agent:v{{ .Major }}.{{ .Minor }}"
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.description=Cut the pork from your cloud costs"
+      - "--label=org.opencontainers.image.url=https://cloudpork.com"
+      - "--label=org.opencontainers.image.source=https://github.com/carsor007/cloudpork-agent"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--platform=linux/amd64"
+
+# Announce to various platforms
+announces:
+  - slack:
+      enabled: false
+      message_template: "CloudPork Agent v{{ .Tag }} is out! Check it out at {{ .ReleaseURL }}"
