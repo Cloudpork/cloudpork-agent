@@ -16,6 +16,12 @@ const (
 	projectIDEnvVar = "CLOUDPORK_PROJECT_ID"
 )
 
+// Config represents the application configuration
+type Config struct {
+	APIKey    string `yaml:"api_key"`
+	ProjectID string `yaml:"project_id"`
+}
+
 // GetAPIKey retrieves the API key from config or environment
 func GetAPIKey() (string, error) {
 	// Check environment variable first
@@ -111,7 +117,7 @@ func saveConfig() error {
 }
 
 // LoadConfig loads configuration from file and environment
-func LoadConfig() error {
+func LoadConfig() (*Config, error) {
 	// Set config file name and paths
 	viper.SetConfigName(configFileName)
 	viper.SetConfigType("yaml")
@@ -129,7 +135,21 @@ func LoadConfig() error {
 	// Read config file (ignore if not found)
 	viper.ReadInConfig()
 	
-	return nil
+	// Build config struct
+	cfg := &Config{
+		APIKey:    viper.GetString("api_key"),
+		ProjectID: viper.GetString("project_id"),
+	}
+	
+	// Check environment variables
+	if key := os.Getenv(apiKeyEnvVar); key != "" {
+		cfg.APIKey = key
+	}
+	if id := os.Getenv(projectIDEnvVar); id != "" {
+		cfg.ProjectID = id
+	}
+	
+	return cfg, nil
 }
 
 // IsAuthenticated checks if user has valid credentials

@@ -3,10 +3,30 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
 )
+
+// Tier constants for subscription tiers
+const (
+	TierTrial        = "trial"        // 7-day trial
+	TierStarter      = "starter"
+	TierProfessional = "professional"
+	TierEnterprise   = "enterprise"
+)
+
+// SubscriptionInfo represents user subscription details
+type SubscriptionInfo struct {
+	Tier           string     `json:"tier"`
+	Status         string     `json:"status"`
+	AnalysesUsed   int        `json:"analyses_used"`
+	AnalysesLimit  int        `json:"analyses_limit"`
+	TrialEndsAt    *time.Time `json:"trial_ends_at,omitempty"`
+	IsTrialing     bool       `json:"is_trialing"`
+	DaysRemaining  int        `json:"days_remaining,omitempty"`
+}
 
 // CodeAnalysis represents the complete analysis result
 type CodeAnalysis struct {
@@ -68,7 +88,7 @@ type PerformanceMetrics struct {
 // PrintSummary prints a formatted summary of the analysis
 func (ca *CodeAnalysis) PrintSummary() {
 	fmt.Printf("%s\n", color.New(color.FgCyan, color.Bold).Sprint("📊 Analysis Summary"))
-	fmt.Printf("%s\n\n", color.New(color.Faint).Sprint("="*50))
+	fmt.Printf("%s\n\n", color.New(color.Faint).Sprint(strings.Repeat("=", 50)))
 	
 	// Basic Info
 	fmt.Printf("🏗️  %s: %s\n", color.New(color.Bold).Sprint("Framework"), ca.Framework)

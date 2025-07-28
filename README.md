@@ -1,8 +1,42 @@
-# CloudPork Agent 🐷
+# CloudPork CLI Agent
 
-> Cut the pork from your cloud costs
+Cut the pork from your cloud costs with intelligent codebase analysis.
 
-CloudPork Agent is a CLI tool that analyzes your codebase locally using Claude Code, then sends only the analysis summary to CloudPork for cost optimization recommendations. Your source code never leaves your machine.
+## 🚀 Quick Start (Free Trial)
+
+1. **Install CloudPork:**
+   ```bash
+   curl -sSL https://cli.cloudpork.com/install.sh | bash
+   ```
+
+2. **Start your free trial:**
+   ```bash
+   cloudpork auth signup
+   ```
+   
+3. **Analyze your codebase:**
+   ```bash
+   cloudpork analyze
+   ```
+
+**Trial includes:** 1 analysis, 7 days to try, no credit card required.
+
+## 🎯 Trial Strategy
+
+Your trial gives you **1 analysis** - make it count! Choose your most important project to see potential cost savings.
+
+After your analysis, you'll see:
+- Projected monthly costs at different scales
+- Specific optimization recommendations  
+- Architecture bottlenecks and solutions
+
+## 💰 Upgrade Options
+
+- **Starter ($29/mo):** 10 analyses/month + export + history
+- **Professional ($149/mo):** 100 analyses/month + team + API  
+- **Enterprise ($499/mo):** Unlimited + local AI + security
+
+[View detailed pricing →](https://cloudpork.com/pricing)
 
 ## Features
 
@@ -11,6 +45,7 @@ CloudPork Agent is a CLI tool that analyzes your codebase locally using Claude C
 - 📊 **Cost projections**: Get scaling estimates from 1K to 100M+ users
 - 🎯 **Optimization recommendations**: Identify bottlenecks before they become expensive
 - 🚀 **Multiple installation methods**: curl, brew, package managers, or direct download
+- 💻 **Local LLM support**: Analyze code completely offline with local models
 
 ## Installation
 
@@ -64,13 +99,13 @@ claude auth login
 
 ## Usage
 
-### 1. Authenticate with CloudPork
+### 1. Start Your Free Trial
 
 ```bash
-cloudpork auth login
+cloudpork auth signup
 ```
 
-You'll need your API key from [cloudpork.com/settings/api-keys](https://cloudpork.com/settings/api-keys).
+No credit card required - just enter your email and get started!
 
 ### 2. Analyze Your Project
 
@@ -88,7 +123,28 @@ cloudpork analyze --project-id=proj_abc123
 cloudpork analyze --output=json
 ```
 
-### 3. View Results
+### 3. Check Your Subscription
+
+```bash
+cloudpork auth status
+```
+
+### 4. Set Up Local AI (Optional)
+
+For complete privacy and offline analysis:
+
+```bash
+# Set up local analysis mode
+cloudpork setup --mode=local
+
+# Or hybrid mode (local analysis + cloud intelligence)
+cloudpork setup --mode=hybrid
+
+# Check system health
+cloudpork doctor
+```
+
+### 5. View Results
 
 After analysis, view your cost projections and optimization recommendations at:
 **https://cloudpork.com/dashboard**
@@ -152,9 +208,23 @@ Analyze your codebase for cost optimization opportunities.
 Manage authentication with CloudPork.
 
 **Subcommands:**
+- `signup`: Start your free trial (no credit card required)
 - `login`: Authenticate with API key
 - `logout`: Remove stored credentials  
-- `status`: Check authentication status
+- `status`: Check subscription and authentication status
+
+### `cloudpork setup`
+Set up local LLM for private code analysis.
+
+**Options:**
+- `--mode`: Analysis mode (local, hybrid, cloud)
+- `--model`: Specific model to install
+- `--validate-hardware`: Check system compatibility
+- `--force`: Force reinstall
+- `--skip-validation`: Skip validation checks
+
+### `cloudpork doctor`
+Diagnose CloudPork setup and configuration issues.
 
 ### `cloudpork version`
 Show version information.

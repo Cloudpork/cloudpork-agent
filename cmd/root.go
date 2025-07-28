@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fatih/color"
+	"github.com/carsor007/cloudpork-agent/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -14,20 +14,28 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cloudpork",
-	Short: "Cut the pork from your cloud costs",
-	Long: color.New(color.FgMagenta, color.Bold).Sprint("🐷 CloudPork Agent") + `
+	Short: "Cut the pork from your cloud costs 🐷",
+	Long: `CloudPork analyzes your codebase to identify cloud cost optimization opportunities.
 
-Analyze your codebase to identify wasteful cloud spending and 
-optimize your infrastructure scaling.
+🎯 New to CloudPork? Start your free trial:
+   cloudpork auth signup
 
-The CloudPork agent uses Claude Code to analyze your project locally,
-then sends only the analysis summary to generate cost projections.
+🔍 Analyze your codebase:
+   cloudpork analyze
 
-Examples:
-  cloudpork analyze                    # Analyze current directory
-  cloudpork analyze --project-id=123  # Analyze with specific project ID
-  cloudpork auth login                 # Authenticate with CloudPork
-  cloudpork version                    # Show version information`,
+📊 Check your subscription:
+   cloudpork auth status
+
+Cut the pork from your cloud costs with intelligent analysis!`,
+	
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		// Check if user needs to sign up (except for auth commands)
+		if cmd.Name() != "auth" && !isAuthenticated() {
+			fmt.Println("👋 Welcome to CloudPork!")
+			fmt.Println("Start your free trial: cloudpork auth signup")
+			fmt.Println()
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -63,4 +71,9 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil && viper.GetBool("verbose") {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+func isAuthenticated() bool {
+	cfg, err := config.LoadConfig()
+	return err == nil && cfg.APIKey != ""
 }

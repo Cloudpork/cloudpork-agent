@@ -60,7 +60,7 @@ func (a *Analyzer) preflightChecks() error {
 	
 	// Check Claude Code installation
 	if !claude.IsInstalled() {
-		fmt.Println(color.Red("❌ Claude Code CLI not found"))
+		color.Red("❌ Claude Code CLI not found")
 		fmt.Println()
 		fmt.Println(claude.GetInstallInstructions())
 		return fmt.Errorf("Claude Code CLI not installed")

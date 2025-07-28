@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/carsor007/cloudpork-agent/internal/types"
-	"github.com/fatih/color"
 )
 
 // Client handles interactions with Claude Code CLI

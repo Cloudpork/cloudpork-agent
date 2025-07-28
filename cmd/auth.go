@@ -2,12 +2,17 @@ package cmd
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/carsor007/cloudpork-agent/internal/config"
+	"github.com/carsor007/cloudpork-agent/internal/types"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
@@ -16,10 +21,8 @@ import (
 // authCmd represents the auth command
 var authCmd = &cobra.Command{
 	Use:   "auth",
-	Short: "Manage CloudPork authentication",
-	Long: `Manage your CloudPork authentication credentials.
-
-Use these commands to login, logout, and check your authentication status.`,
+	Short: "Authentication commands",
+	Long:  "Manage CloudPork authentication and trial signup",
 }
 
 var loginCmd = &cobra.Command{
@@ -40,10 +43,24 @@ var logoutCmd = &cobra.Command{
 	RunE:  runLogout,
 }
 
+var signupCmd = &cobra.Command{
+	Use:   "signup",
+	Short: "Start your 7-day free trial",
+	Long: `Start your 7-day free trial with CloudPork.
+Get 1 analysis to see how much you can save on cloud costs.
+
+After signup, you'll receive:
+• 1 codebase analysis (choose your most important project!)
+• Basic cost projections and optimization recommendations
+• 7 days to see the value before deciding to upgrade
+
+No credit card required for trial.`,
+	RunE: runSignup,
+}
+
 var statusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "Check authentication status",
-	Long:  `Check if you're currently authenticated with CloudPork.`,
+	Short: "Check your subscription status",
 	RunE:  runStatus,
 }
 
@@ -51,6 +68,7 @@ func init() {
 	rootCmd.AddCommand(authCmd)
 	authCmd.AddCommand(loginCmd)
 	authCmd.AddCommand(logoutCmd)
+	authCmd.AddCommand(signupCmd)
 	authCmd.AddCommand(statusCmd)
 }
 
@@ -114,27 +132,148 @@ func runLogout(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runStatus(cmd *cobra.Command, args []string) error {
-	apiKey, err := config.GetAPIKey()
-	if err != nil || apiKey == "" {
-		color.Red("❌ Not authenticated")
-		fmt.Println("Run 'cloudpork auth login' to authenticate")
-		return nil
+func runSignup(cmd *cobra.Command, args []string) error {
+	fmt.Println("🐷 Welcome to CloudPork!")
+	fmt.Println("Let's start your 7-day free trial...")
+	fmt.Println()
+	
+	// Get user info
+	email, err := promptForInput("Work email: ")
+	if err != nil {
+		return err
 	}
 	
-	// Mask API key for display
-	maskedKey := maskAPIKey(apiKey)
-	
-	projectID, _ := config.GetProjectID()
-	
-	color.Green("✅ Authenticated with CloudPork")
-	fmt.Printf("🔑 API Key: %s\n", maskedKey)
-	if projectID != "" {
-		fmt.Printf("📝 Project ID: %s\n", projectID)
+	name, err := promptForInput("Your name: ")
+	if err != nil {
+		return err
 	}
-	fmt.Println("🌐 Dashboard: https://cloudpork.com/dashboard")
+	
+	company, err := promptForInput("Company (optional): ")
+	if err != nil {
+		return err
+	}
+	
+	// Create trial account
+	trialInfo, err := createTrialAccount(email, name, company)
+	if err != nil {
+		return fmt.Errorf("failed to create trial: %w", err)
+	}
+	
+	// Save config
+	err = config.SetAPIKey(trialInfo.APIKey)
+	if err != nil {
+		return fmt.Errorf("failed to save API key: %w", err)
+	}
+	
+	err = config.SetProjectID(trialInfo.ProjectID)
+	if err != nil {
+		return fmt.Errorf("failed to save project ID: %w", err)
+	}
+	
+	fmt.Println("🎉 Trial activated!")
+	fmt.Printf("   • Trial ends: %s\n", trialInfo.TrialEndsAt.Format("January 2, 2006"))
+	fmt.Printf("   • Analyses remaining: %d\n", trialInfo.AnalysesRemaining)
+	fmt.Printf("   • Project ID: %s\n", trialInfo.ProjectID)
+	fmt.Println()
+	fmt.Println("🚀 Ready to analyze! Run: cloudpork analyze")
+	fmt.Println("💡 Choose your most important project - you get 1 analysis!")
 	
 	return nil
+}
+
+func runStatus(cmd *cobra.Command, args []string) error {
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		return fmt.Errorf("not logged in. Run: cloudpork auth login")
+	}
+	
+	subscription, err := getSubscriptionInfo(cfg.APIKey)
+	if err != nil {
+		return fmt.Errorf("failed to get status: %w", err)
+	}
+	
+	fmt.Println("📊 CloudPork Status")
+	fmt.Println("==================")
+	fmt.Printf("Plan: %s\n", strings.Title(subscription.Tier))
+	fmt.Printf("Status: %s\n", strings.Title(subscription.Status))
+	
+	if subscription.IsTrialing {
+		fmt.Printf("Trial ends: %s\n", subscription.TrialEndsAt.Format("January 2, 2006"))
+		fmt.Printf("Days remaining: %d\n", subscription.DaysRemaining)
+	}
+	
+	if subscription.AnalysesLimit == -1 {
+		fmt.Printf("Analyses used: %d (unlimited)\n", subscription.AnalysesUsed)
+	} else {
+		fmt.Printf("Analyses used: %d/%d\n", subscription.AnalysesUsed, subscription.AnalysesLimit)
+	}
+	
+	fmt.Printf("Project ID: %s\n", cfg.ProjectID)
+	
+	if subscription.Tier == types.TierTrial {
+		fmt.Println()
+		fmt.Println("🎯 Upgrade Options:")
+		fmt.Println("   🌱 Starter ($29/mo): 10 analyses/month")
+		fmt.Println("   ⚡ Professional ($149/mo): 100 analyses/month + team features")
+		fmt.Println("   🏢 Enterprise ($499/mo): Unlimited + local AI + security")
+		fmt.Println()
+		fmt.Println("   Upgrade: https://cloudpork.com/pricing")
+	}
+	
+	return nil
+}
+
+type TrialInfo struct {
+	APIKey             string    `json:"api_key"`
+	ProjectID          string    `json:"project_id"`
+	TrialEndsAt        time.Time `json:"trial_ends_at"`
+	AnalysesRemaining  int       `json:"analyses_remaining"`
+}
+
+func createTrialAccount(email, name, company string) (*TrialInfo, error) {
+	client := &http.Client{Timeout: 10 * time.Second}
+	
+	payload := map[string]string{
+		"email":   email,
+		"name":    name,
+		"company": company,
+	}
+	
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	
+	resp, err := client.Post(
+		"https://api.cloudpork.com/v1/auth/trial",
+		"application/json",
+		bytes.NewBuffer(jsonData),
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != 201 {
+		return nil, fmt.Errorf("signup failed: %s", resp.Status)
+	}
+	
+	var trialInfo TrialInfo
+	if err := json.NewDecoder(resp.Body).Decode(&trialInfo); err != nil {
+		return nil, err
+	}
+	
+	return &trialInfo, nil
+}
+
+func promptForInput(prompt string) (string, error) {
+	fmt.Print(prompt)
+	reader := bufio.NewReader(os.Stdin)
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(text), nil
 }
 
 func maskAPIKey(apiKey string) string {
