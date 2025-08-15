@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/carsor007/cloudpork-agent/cmd"
+	"github.com/Cloudpork/cloudpork-agent/cmd"
 )
 
 func main() {

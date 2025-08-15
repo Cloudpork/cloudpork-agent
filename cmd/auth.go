@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/carsor007/cloudpork-agent/internal/config"
-	"github.com/carsor007/cloudpork-agent/internal/types"
+	"github.com/Cloudpork/cloudpork-agent/internal/config"
+	"github.com/Cloudpork/cloudpork-agent/internal/types"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"

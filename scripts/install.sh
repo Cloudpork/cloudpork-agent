@@ -15,7 +15,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Constants
-REPO="carsor007/cloudpork-agent"
+REPO="Cloudpork/cloudpork-agent"
 BINARY_NAME="cloudpork"
 INSTALL_DIR="/usr/local/bin"
 

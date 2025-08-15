@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/carsor007/cloudpork-agent/internal/config"
+	"github.com/Cloudpork/cloudpork-agent/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

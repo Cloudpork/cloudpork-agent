@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/carsor007/cloudpork-agent/internal/config"
-	"github.com/carsor007/cloudpork-agent/internal/types"
+	"github.com/Cloudpork/cloudpork-agent/internal/config"
+	"github.com/Cloudpork/cloudpork-agent/internal/types"
 )
 
 const (

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/carsor007/cloudpork-agent/internal/claude"
-	"github.com/carsor007/cloudpork-agent/internal/types"
+	"github.com/Cloudpork/cloudpork-agent/internal/claude"
+	"github.com/Cloudpork/cloudpork-agent/internal/types"
 	"github.com/fatih/color"
 )
 

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/carsor007/cloudpork-agent/internal/types"
+	"github.com/Cloudpork/cloudpork-agent/internal/types"
 )
 
 // Client handles interactions with Claude Code CLI
