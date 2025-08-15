@@ -62,17 +62,17 @@ curl -sSL https://cli.cloudpork.com/install.sh | bash
 brew install carsor007/tap/cloudpork
 
 # Ubuntu/Debian
-curl -sL https://github.com/carsor007/cloudpork-agent/releases/latest/download/cloudpork_linux_amd64.deb
+curl -sL https://github.com/Cloudpork/cloudpork-agent/releases/latest/download/cloudpork_linux_amd64.deb
 sudo dpkg -i cloudpork_linux_amd64.deb
 
 # CentOS/RHEL
-curl -sL https://github.com/carsor007/cloudpork-agent/releases/latest/download/cloudpork_linux_amd64.rpm  
+curl -sL https://github.com/Cloudpork/cloudpork-agent/releases/latest/download/cloudpork_linux_amd64.rpm  
 sudo rpm -i cloudpork_linux_amd64.rpm
 ```
 
 ### Manual Download
 
-Download the latest binary from [GitHub Releases](https://github.com/carsor007/cloudpork-agent/releases).
+Download the latest binary from [GitHub Releases](https://github.com/Cloudpork/cloudpork-agent/releases).
 
 ## Prerequisites
 
@@ -257,7 +257,7 @@ project_id: proj_abc123
 ### Building from Source
 
 ```bash
-git clone https://github.com/carsor007/cloudpork-agent.git
+git clone https://github.com/Cloudpork/cloudpork-agent.git
 cd cloudpork-agent
 make build
 ```
@@ -306,7 +306,7 @@ cloudpork auth status
 
 - 📖 **Documentation**: https://docs.cloudpork.com
 - 🌐 **Dashboard**: https://cloudpork.com/dashboard  
-- 🐛 **Issues**: https://github.com/carsor007/cloudpork-agent/issues
+- 🐛 **Issues**: https://github.com/Cloudpork/cloudpork-agent/issues
 - 💬 **Support**: support@cloudpork.com
 
 ## License

@@ -9,9 +9,9 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
-      - -X github.com/carsor007/cloudpork-agent/cmd.version={{.Version}}
-      - -X github.com/carsor007/cloudpork-agent/cmd.commit={{.Commit}}
-      - -X github.com/carsor007/cloudpork-agent/cmd.date={{.Date}}
+      - -X github.com/Cloudpork/cloudpork-agent/cmd.version={{.Version}}
+      - -X github.com/Cloudpork/cloudpork-agent/cmd.commit={{.Commit}}
+      - -X github.com/Cloudpork/cloudpork-agent/cmd.date={{.Date}}
     env:
       - CGO_ENABLED=0
     goos:
@@ -138,7 +138,7 @@ dockers:
       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
       - "--label=org.opencontainers.image.description=Cut the pork from your cloud costs"
       - "--label=org.opencontainers.image.url=https://cloudpork.com"
-      - "--label=org.opencontainers.image.source=https://github.com/carsor007/cloudpork-agent"
+      - "--label=org.opencontainers.image.source=https://github.com/Cloudpork/cloudpork-agent"
       - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--label=org.opencontainers.image.created={{ .Date }}"
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"

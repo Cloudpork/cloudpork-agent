@@ -7,7 +7,7 @@ BINARY_NAME := cloudpork
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 COMMIT := $(shell git rev-parse HEAD 2>/dev/null || echo "unknown")
 DATE := $(shell date -u '+%Y-%m-%d_%H:%M:%S')
-LDFLAGS := -ldflags "-s -w -X github.com/carsor007/cloudpork-agent/cmd.version=$(VERSION) -X github.com/carsor007/cloudpork-agent/cmd.commit=$(COMMIT) -X github.com/carsor007/cloudpork-agent/cmd.date=$(DATE)"
+LDFLAGS := -ldflags "-s -w -X github.com/Cloudpork/cloudpork-agent/cmd.version=$(VERSION) -X github.com/Cloudpork/cloudpork-agent/cmd.commit=$(COMMIT) -X github.com/Cloudpork/cloudpork-agent/cmd.date=$(DATE)"
 
 # Default target
 all: build

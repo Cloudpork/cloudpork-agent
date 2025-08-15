@@ -1,4 +1,4 @@
-module github.com/carsor007/cloudpork-agent
+module github.com/Cloudpork/cloudpork-agent
 
 go 1.21
 
