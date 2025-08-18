@@ -66,7 +66,7 @@ changelog:
 # Release configuration
 release:
   github:
-    owner: carsor007
+    owner: Cloudpork
     name: cloudpork-agent
   draft: false
   prerelease: auto
@@ -93,7 +93,7 @@ brews:
     ids:
       - cloudpork
     tap:
-      owner: carsor007
+      owner: Cloudpork
       name: homebrew-tap
     homepage: https://cloudpork.com
     description: "Cut the pork from your cloud costs - analyze and optimize your infrastructure spending"
